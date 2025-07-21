@@ -1,0 +1,262 @@
+/* Reset and base styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #87CEEB 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    overflow: hidden;
+    margin: 0;
+    padding: 20px;
+}
+
+#gameContainer {
+    position: relative;
+    border: 4px solid #2F4F4F;
+    border-radius: 20px;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(255, 255, 255, 0.1);
+    background: linear-gradient(135deg, #87CEEB 0%, #98D8E8 100%);
+    max-width: 90vw;
+    max-height: 90vh;
+}
+
+#gameCanvas {
+    display: block;
+    border-radius: 16px;
+    background: linear-gradient(to bottom, #87CEEB 0%, #98D8E8 60%, #90EE90 85%, #32CD32 100%);
+}
+
+/* Screen overlays */
+.screen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.8) 0%, rgba(30, 60, 114, 0.9) 100%);
+    color: white;
+    text-align: center;
+    z-index: 10;
+    backdrop-filter: blur(5px);
+    border-radius: 16px;
+}
+
+.screen h1 {
+    font-size: 4rem;
+    margin-bottom: 1.5rem;
+    color: #FFD700;
+    text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.8);
+    font-weight: bold;
+    letter-spacing: 2px;
+}
+
+.screen p {
+    font-size: 1.4rem;
+    margin-bottom: 0.8rem;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
+}
+
+.controls {
+    font-size: 1rem !important;
+    color: #DDD !important;
+    margin-top: 1rem !important;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* Score display */
+#scoreDisplay {
+    position: absolute;
+    top: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 5;
+    font-size: 3rem;
+    font-weight: bold;
+    color: white;
+    text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.8);
+    background: rgba(0, 0, 0, 0.3);
+    padding: 10px 20px;
+    border-radius: 15px;
+    backdrop-filter: blur(10px);
+}
+
+/* Game over screen specific */
+#gameOverScreen button {
+    background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+    border: none;
+    padding: 20px 40px;
+    font-size: 1.4rem;
+    font-weight: bold;
+    border-radius: 15px;
+    cursor: pointer;
+    margin-top: 1.5rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+#gameOverScreen button:hover {
+    background: linear-gradient(135deg, #FFA500 0%, #FF8C00 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 7px 20px rgba(0, 0, 0, 0.4);
+}
+
+#gameOverScreen button:active {
+    transform: translateY(0) scale(0.98);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* Mobile controls */
+#mobileControls {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 5;
+}
+
+#flapBtn {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 215, 0, 0.3) 100%);
+    border: 2px solid white;
+    color: white;
+    padding: 10px 20px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    border-radius: 8px;
+    cursor: pointer;
+    backdrop-filter: blur(15px);
+    transition: all 0.3s ease;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+#flapBtn:active {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 215, 0, 0.5) 100%);
+    transform: scale(0.95);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+/* Responsive design */
+@media (max-width: 700px) {
+    body {
+        padding: 10px;
+    }
+    
+    #gameContainer {
+        border: 2px solid #2F4F4F;
+        border-radius: 15px;
+        width: 95vw;
+        height: 85vh;
+    }
+    
+    #gameCanvas {
+        width: 100%;
+        height: 100%;
+        border-radius: 13px;
+    }
+    
+    .screen h1 {
+        font-size: 3rem;
+    }
+    
+    .screen p {
+        font-size: 1.2rem;
+    }
+    
+    #scoreDisplay {
+        font-size: 2rem;
+        top: 20px;
+        padding: 8px 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    #gameContainer {
+        border: none;
+        border-radius: 0;
+        width: 100vw;
+        height: 100vh;
+    }
+    
+    #gameCanvas {
+        width: 100vw;
+        height: 100vh;
+        border-radius: 0;
+    }
+    
+    .screen h1 {
+        font-size: 2.5rem;
+    }
+    
+    .screen p {
+        font-size: 1rem;
+    }
+    
+    #scoreDisplay {
+        font-size: 1.8rem;
+        top: 30px;
+        padding: 6px 12px;
+    }
+}
+
+@media (max-height: 600px) {
+    .screen h1 {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .screen p {
+        font-size: 1rem;
+        margin-bottom: 0.3rem;
+    }
+}
+
+/* Animation for smooth transitions */
+.screen {
+    transition: opacity 0.3s ease;
+}
+
+/* Pulse animation for start screen */
+@keyframes pulse {
+    0%, 100% { 
+        opacity: 1; 
+        transform: scale(1);
+    }
+    50% { 
+        opacity: 0.7; 
+        transform: scale(1.05);
+    }
+}
+
+@keyframes glow {
+    0%, 100% {
+        text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.8), 0 0 20px rgba(255, 215, 0, 0.5);
+    }
+    50% {
+        text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.8), 0 0 30px rgba(255, 215, 0, 0.8);
+    }
+}
+
+#startScreen p:first-of-type {
+    animation: pulse 2s infinite;
+}
+
+#startScreen h1 {
+    animation: glow 3s infinite;
+}
