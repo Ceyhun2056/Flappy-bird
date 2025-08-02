@@ -1,15 +1,15 @@
 // Game constants
-const GAME_CONFIG = {
+let GAME_CONFIG = {
     CANVAS_WIDTH: 800,
     CANVAS_HEIGHT: 400,
     BIRD_SIZE: 20,
     BIRD_X: 100,
-    GRAVITY: 0.5,
-    FLAP_STRENGTH: -10,
+    GRAVITY: 0.25,
+    FLAP_STRENGTH: -6,
     PIPE_WIDTH: 60,
-    PIPE_GAP: 120,
-    PIPE_SPEED: 2,
-    PIPE_SPAWN_RATE: 120, // frames between pipe spawns
+    PIPE_GAP: 140,
+    PIPE_SPEED: 1.5,
+    PIPE_SPAWN_RATE: 150, // frames between pipe spawns
 };
 
 // Game state
@@ -52,17 +52,28 @@ function resizeCanvas() {
         canvas.height = window.innerHeight;
         GAME_CONFIG.CANVAS_WIDTH = canvas.width;
         GAME_CONFIG.CANVAS_HEIGHT = canvas.height;
+        // Adjust physics for mobile screens - make it even easier
+        GAME_CONFIG.GRAVITY = 0.2;
+        GAME_CONFIG.FLAP_STRENGTH = -5;
+        GAME_CONFIG.PIPE_GAP = 160;
+        GAME_CONFIG.PIPE_SPEED = 1.2;
         mobileControls.classList.remove('hidden');
     } else {
         canvas.width = 800;
         canvas.height = 400;
         GAME_CONFIG.CANVAS_WIDTH = 800;
         GAME_CONFIG.CANVAS_HEIGHT = 400;
+        // Reset physics for desktop - easier settings
+        GAME_CONFIG.GRAVITY = 0.25;
+        GAME_CONFIG.FLAP_STRENGTH = -6;
+        GAME_CONFIG.PIPE_GAP = 140;
+        GAME_CONFIG.PIPE_SPEED = 1.5;
         mobileControls.classList.add('hidden');
     }
     
     // Reset bird position
     bird.y = GAME_CONFIG.CANVAS_HEIGHT / 2;
+    bird.velocity = 0; // Reset velocity when resizing
 }
 
 // Initialize game
@@ -113,6 +124,9 @@ function startGame() {
     // Reset bird
     bird.y = GAME_CONFIG.CANVAS_HEIGHT / 2;
     bird.velocity = 0;
+    
+    // Add a grace period before first pipe appears
+    frameCount = -60; // Delay first pipe by 1 second (60 frames)
     
     // Hide start screen, show score
     startScreen.classList.add('hidden');
@@ -175,12 +189,27 @@ function updateBird() {
     
     // Apply gravity
     bird.velocity += GAME_CONFIG.GRAVITY;
+    
+    // Add velocity damping to prevent excessive falling speed
+    const maxFallSpeed = 5;
+    if (bird.velocity > maxFallSpeed) {
+        bird.velocity = maxFallSpeed;
+    }
+    
+    // Add upward velocity limit too
+    const maxUpSpeed = -6;
+    if (bird.velocity < maxUpSpeed) {
+        bird.velocity = maxUpSpeed;
+    }
+    
+    // Update bird position
     bird.y += bird.velocity;
     
     // Check ground collision (account for ground height)
     const groundY = GAME_CONFIG.CANVAS_HEIGHT - 30;
     if (bird.y + bird.size >= groundY) {
         bird.y = groundY - bird.size;
+        bird.velocity = 0; // Reset velocity on ground hit
         gameOver();
     }
     
@@ -194,9 +223,13 @@ function updateBird() {
 function updatePipes() {
     if (gameState !== 'playing') return;
     
-    // Spawn new pipes
-    if (frameCount % GAME_CONFIG.PIPE_SPAWN_RATE === 0) {
-        const gapY = Math.random() * (GAME_CONFIG.CANVAS_HEIGHT - GAME_CONFIG.PIPE_GAP - 100) + 50;
+    // Spawn new pipes (only after grace period)
+    if (frameCount > 0 && frameCount % GAME_CONFIG.PIPE_SPAWN_RATE === 0) {
+        // Make gaps more centered and avoid extreme positions
+        const minGapY = 80;
+        const maxGapY = GAME_CONFIG.CANVAS_HEIGHT - GAME_CONFIG.PIPE_GAP - 80;
+        const gapY = Math.random() * (maxGapY - minGapY) + minGapY;
+        
         pipes.push({
             x: GAME_CONFIG.CANVAS_WIDTH,
             topHeight: gapY,
@@ -244,11 +277,14 @@ function updateParticles() {
 }
 
 function checkPipeCollision(pipe) {
-    // Bird boundaries
-    const birdLeft = bird.x;
-    const birdRight = bird.x + bird.size;
-    const birdTop = bird.y;
-    const birdBottom = bird.y + bird.size;
+    // Add collision tolerance to make the game more forgiving
+    const tolerance = 3;
+    
+    // Bird boundaries with tolerance
+    const birdLeft = bird.x + tolerance;
+    const birdRight = bird.x + bird.size - tolerance;
+    const birdTop = bird.y + tolerance;
+    const birdBottom = bird.y + bird.size - tolerance;
     
     // Pipe boundaries
     const pipeLeft = pipe.x;
@@ -256,8 +292,8 @@ function checkPipeCollision(pipe) {
     
     // Check if bird is within pipe's x range
     if (birdRight > pipeLeft && birdLeft < pipeRight) {
-        // Check collision with top or bottom pipe
-        if (birdTop < pipe.topHeight || birdBottom > pipe.bottomY) {
+        // Check collision with top or bottom pipe (with tolerance)
+        if (birdTop < pipe.topHeight - tolerance || birdBottom > pipe.bottomY + tolerance) {
             return true;
         }
     }
